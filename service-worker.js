@@ -1,9 +1,11 @@
-const CACHE_NAME = "axiom-v1";
+const CACHE_NAME = "axiom-v2";
 
 const FILES_TO_CACHE = [
     "./",
     "./index.html",
-    "./manifest.json"
+    "./manifest.json",
+    "./js/database.js",
+    "./js/app.js"
 ];
 
 self.addEventListener("install", (event) => {
