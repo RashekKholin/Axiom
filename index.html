@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Axiom">
+<title>Axiom</title>
+<style>
+*{box-sizing:border-box}
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif;background:#0f1115;color:#f5f5f7}
+html,body{margin:0;padding:0;background:#0f1115;color:#f5f5f7;min-height:100%;font-family:inherit}
+body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+#app{min-height:100vh}
+main{max-width:760px;margin:auto;padding:24px 17px 32px}
+h1{font-size:34px;line-height:1.05;letter-spacing:-1.3px;margin:0 0 10px}
+h2{font-size:25px;line-height:1.25;margin:0 0 20px}
+h3{margin:0}
+.eyebrow{font-size:12px;letter-spacing:2px;font-weight:800;color:#858a96;margin:0 0 8px}
+.muted{color:#8c919d}
+.hero{padding:24px 0 15px}
+.primary{width:100%;border:0;border-radius:15px;padding:15px 18px;background:#f5f5f7;color:#101216;font-weight:800}
+.primary.big{font-size:16px;margin:8px 0 4px}
+.card{background:#171a20;border:1px solid #272b34;border-radius:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.action{border:1px solid #272b34;text-align:left;padding:17px;min-height:105px;color:#f5f5f7;background:#171a20;border-radius:18px}
+.action b,.action span{display:block}
+.action span{font-size:13px;color:#858a96;margin-top:7px;line-height:1.35}
+.section-title{font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#9297a3;margin:28px 0 11px}
+.empty{padding:24px;text-align:center;color:#8c919d;display:flex;flex-direction:column;gap:8px}
+.empty b{color:#f5f5f7}
+.material{padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px}
+.material h3{font-size:16px;margin:8px 0 5px}
+.pill{display:inline-block;background:#252a33;color:#b7bcc7;border-radius:999px;padding:5px 8px;font-size:10px;text-transform:uppercase;font-weight:800}
+.icon{border:0;background:transparent;color:#858a96;font-size:25px;padding:0 4px}
+.bottom-nav{position:fixed;z-index:20;left:0;right:0;bottom:0;height:76px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:rgba(15,17,21,.95);backdrop-filter:blur(18px);border-top:1px solid #272b34}
+.nav{border:0;background:transparent;color:#747a86;min-width:58px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav span{font-size:20px;line-height:1}
+.nav small{font-size:10px;font-weight:700}
+.nav.active{color:#f5f5f7}
+.form{display:flex;flex-direction:column;gap:16px}
+.form label{font-size:13px;font-weight:700;color:#d7dae1}
+.form input,.form select,.form textarea{display:block;width:100%;margin-top:7px;background:#171a20;color:#f5f5f7;border:1px solid #2c3039;border-radius:13px;padding:14px;outline:none}
+.form textarea{min-height:115px;resize:vertical;line-height:1.45}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:#777e8b}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.study-card{padding:22px;margin-top:15px}
+.study-meta{font-size:12px;color:#858a96;margin-bottom:28px}
+.answer{background:#101217;border-radius:14px;padding:18px;line-height:1.5;margin:0 0 17px;white-space:pre-wrap}
+.hidden{display:none!important}
+.ratings{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rating{border:1px solid #30343d;background:#20242c;color:#f5f5f7;border-radius:12px;padding:13px 6px;font-weight:700}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{padding:18px}
+.stat b{display:block;font-size:30px;margin-bottom:4px}
+.stat span{font-size:12px;color:#858a96}
+.progress-row{padding:17px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.progress-row span{display:block;color:#858a96;font-size:12px;margin-top:4px}
+.settings{padding:18px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.settings button{border:1px solid #30343d;background:#20242c;color:#f5f5f7;border-radius:12px;padding:13px;text-align:left;font-weight:700}
+.notice{padding:14px;border-radius:13px;background:#20242c;color:#aeb4bf;font-size:13px;line-height:1.4}
+.search{margin:0 0 14px}
+.search input{width:100%;background:#171a20;border:1px solid #2c3039;color:#fff;border-radius:13px;padding:13px}
+.center{text-align:center}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.two{grid-template-columns:1fr}main{padding-left:15px;padding-right:15px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+const KEY="axiom-data-v1";
+
+const DEFAULT_SUBJECTS=[
+"Biology","General Chemistry","Organic Chemistry",
+"Perceptual Ability","Reading Comprehension","Quantitative Reasoning"
+];
+
+const DEFAULT_TOPICS={
+"Biology":["Cell Biology","Molecular Biology","Genetics","Evolution","Ecology","Anatomy","Physiology","Reproduction","Development","Plant Biology","Animal Biology","Microbiology","Taxonomy","Biochemistry","Other"],
+"General Chemistry":["Atomic Structure","Periodic Trends","Bonding","Molecular Structure","Stoichiometry","Chemical Reactions","Gases","Solutions","Thermochemistry","Thermodynamics","Kinetics","Equilibrium","Acids and Bases","Electrochemistry","Nuclear Chemistry","Other"],
+"Organic Chemistry":["Structure","Nomenclature","Isomerism","Stereochemistry","Acids and Bases","Functional Groups","Substitution","Elimination","Addition","Oxidation","Reduction","Carbonyl Chemistry","Aromatic Chemistry","Spectroscopy","Reactions","Mechanisms","Other"],
+"Perceptual Ability":["Keyholes","Top-Front-End","Angle Ranking","Hole Punching","Cube Counting","Pattern Folding"],
+"Reading Comprehension":["Passages","Question Sets","Strategy","Timed Practice"],
+"Quantitative Reasoning":["Arithmetic","Algebra","Geometry","Word Problems","Probability","Statistics","Quantitative Comparison","Other"]
+};
+
+let data=loadData();
+let screen="home";
+let studyId=null;
+let answerShown=false;
+
+function loadData(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(KEY));
+    if(saved) return saved;
+  }catch(e){}
+  const subjects=DEFAULT_SUBJECTS.map(name=>({id:uid(),name}));
+  const topics=[];
+  subjects.forEach(s=>(DEFAULT_TOPICS[s.name]||[]).forEach(name=>topics.push({id:uid(),subjectId:s.id,name})));
+  const d={version:1,subjects,topics,materials:[],sessions:[]};
+  localStorage.setItem(KEY,JSON.stringify(d));
+  return d;
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function uid(){return "ax-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9)}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function subjectName(id){return data.subjects.find(x=>x.id===id)?.name||"Unknown"}
+function topicName(id){return data.topics.find(x=>x.id===id)?.name||""}
+function due(m){return !m.nextReview||new Date(m.nextReview).getTime()<=Date.now()}
+function dueList(){return data.materials.filter(due).sort((a,b)=>(a.mastery||0)-(b.mastery||0))}
+function go(s){screen=s;answerShown=false;render();window.scrollTo(0,0)}
+
+function render(){
+  let content="";
+  if(screen==="home")content=home();
+  else if(screen==="add")content=add();
+  else if(screen==="study")content=study();
+  else if(screen==="progress")content=progress();
+  else if(screen==="settings")content=settings();
+  document.getElementById("app").innerHTML=`<main>${content}</main>${nav()}`;
+  bind();
+}
+
+function nav(){
+ return `<nav class="bottom-nav">
+  ${navBtn("home","⌂","Home")}
+  ${navBtn("study","▶","Study")}
+  ${navBtn("add","＋","Add")}
+  ${navBtn("progress","◔","Progress")}
+  ${navBtn("settings","⚙","Settings")}
+ </nav>`;
+}
+function navBtn(s,icon,label){
+ return `<button class="nav ${screen===s?"active":""}" data-go="${s}"><span>${icon}</span><small>${label}</small></button>`;
+}
+
+function home(){
+ const dueCount=dueList().length;
+ const recent=[...data.materials].reverse().slice(0,4);
+ return `<section>
+  <div class="hero">
+   <p class="eyebrow">AXIOM</p>
+   <h1>What should you study?</h1>
+   <p class="muted">${dueCount?`${dueCount} review${dueCount===1?"":"s"} due.`:"You're caught up."}</p>
+  </div>
+  <button class="primary big" data-go="study">${dueCount?"Study Now":"Start Studying"}</button>
+  <div class="section-title">Quick Actions</div>
+  <div class="grid">
+   <button class="action" data-go="study"><b>Flashcards</b><span>Review material with spaced repetition.</span></button>
+   <button class="action" data-go="study"><b>Practice</b><span>Test yourself and record results.</span></button>
+   <button class="action" data-go="add"><b>Add Material</b><span>Create cards, questions, notes, and formulas.</span></button>
+   <button class="action" data-go="progress"><b>Progress</b><span>See accuracy, mastery, and reviews.</span></button>
+  </div>
+  <div class="section-title">Library</div>
+  ${recent.length?recent.map(materialCard).join(""):`<div class="empty card"><b>Your library is empty.</b><span>Add your first flashcard to begin.</span><button class="primary" data-go="add">Add Material</button></div>`}
+ </section>`;
+}
+
+function materialCard(m){
+ return `<div class="material card">
+  <div><span class="pill">${esc(m.type)}</span><h3>${esc(m.front)}</h3><span class="muted">${esc(subjectName(m.subjectId))}${m.topicId?" · "+esc(topicName(m.topicId)):""}</span></div>
+  <button class="icon" data-delete="${m.id}" aria-label="Delete">×</button>
+ </div>`;
+}
+
+function add(){
+ return `<section>
+  <p class="eyebrow">CREATE</p><h1>Add Material</h1>
+  <p class="muted">Everything you add is stored on this device.</p>
+  <form id="add-form" class="form">
+   <label>Material Type
+    <select id="type"><option value="flashcard">Flashcard</option><option value="question">Practice Question</option><option value="note">Note</option><option value="formula">Formula</option></select>
+   </label>
+   <label>Subject
+    <select id="subject">${data.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")}<option value="new">＋ New Subject</option></select>
+   </label>
+   <div id="new-subject-wrap" class="hidden"><label>New Subject<input id="new-subject" placeholder="e.g. Physics"></label></div>
+   <label>Topic
+    <select id="topic"></select>
+   </label>
+   <div id="new-topic-wrap" class="hidden"><label>New Topic<input id="new-topic" placeholder="e.g. Mechanics"></label></div>
+   <div class="two">
+    <label>Difficulty<select id="difficulty"><option value="1">1 — Easy</option><option value="2" selected>2 — Moderate</option><option value="3">3 — Hard</option><option value="4">4 — Very Hard</option><option value="5">5 — Expert</option></select></label>
+    <label>Tags<input id="tags" placeholder="cells, metabolism"></label>
+   </div>
+   <label>Question / Front<textarea id="front" required placeholder="What do you want to remember?"></textarea></label>
+   <label>Answer / Back<textarea id="back" required placeholder="Enter the answer..."></textarea></label>
+   <label>Explanation<textarea id="explanation" placeholder="Optional explanation..."></textarea></label>
+   <button class="primary" type="submit">Save Material</button>
+  </form>
+ </section>`;
+}
+
+function populateTopics(){
+ const s=document.getElementById("subject"),t=document.getElementById("topic");
+ if(!s||!t)return;
+ const subjectId=s.value;
+ const topics=data.topics.filter(x=>x.subjectId===subjectId);
+ t.innerHTML=topics.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("")+`<option value="new">＋ New Topic</option>`;
+}
+
+function study(){
+ if(!data.materials.length)return `<section><p class="eyebrow">STUDY</p><h1>Study</h1><div class="empty card"><b>Nothing to study yet.</b><span>Add material first.</span><button class="primary" data-go="add">Add Material</button></div></section>`;
+ if(!studyId||!data.materials.some(m=>m.id===studyId)||!due(data.materials.find(m=>m.id===studyId))) {
+   const pool=dueList().length?dueList():data.materials;
+   studyId=pool[0].id;
+ }
+ const m=data.materials.find(x=>x.id===studyId);
+ return `<section>
+  <p class="eyebrow">STUDY</p><h1>Flashcards</h1>
+  <div class="study-card card">
+   <div class="study-meta">${esc(subjectName(m.subjectId))}${m.topicId?" · "+esc(topicName(m.topicId)):""} · Difficulty ${m.difficulty}</div>
+   <h2>${esc(m.front)}</h2>
+   <div class="${answerShown?"answer":"answer hidden"}">${esc(m.back)}</div>
+   ${answerShown?`<div class="ratings">
+     <button class="rating" data-rate="again">Again</button>
+     <button class="rating" data-rate="hard">Hard</button>
+     <button class="rating" data-rate="good">Good</button>
+     <button class="rating" data-rate="easy">Easy</button>
+   </div>`:`<button class="primary" data-reveal>Reveal Answer</button>`}
+  </div>
+  <p class="muted center">${dueList().length} review${dueList().length===1?"":"s"} due</p>
+ </section>`;
+}
+
+function progress(){
+ const total=data.materials.length;
+ const attempts=data.materials.reduce((n,m)=>n+(m.correct||0)+(m.incorrect||0),0);
+ const correct=data.materials.reduce((n,m)=>n+(m.correct||0),0);
+ const accuracy=attempts?Math.round(correct/attempts*100):0;
+ const mastered=data.materials.filter(m=>(m.mastery||0)>=90).length;
+ return `<section>
+  <p class="eyebrow">OVERVIEW</p><h1>Progress</h1>
+  <div class="stats">
+   <div class="stat card"><b>${total}</b><span>Materials</span></div>
+   <div class="stat card"><b>${accuracy}%</b><span>Accuracy</span></div>
+   <div class="stat card"><b>${mastered}</b><span>Mastered</span></div>
+   <div class="stat card"><b>${dueList().length}</b><span>Due</span></div>
+  </div>
+  <div class="section-title">Subjects</div>
+  ${data.subjects.map(s=>{
+    const ms=data.materials.filter(m=>m.subjectId===s.id);
+    const mastery=ms.length?Math.round(ms.reduce((n,m)=>n+(m.mastery||0),0)/ms.length):0;
+    return `<div class="progress-row card"><div><b>${esc(s.name)}</b><span>${ms.length} material${ms.length===1?"":"s"}</span></div><strong>${mastery}%</strong></div>`;
+  }).join("")}
+ </section>`;
+}
+
+function settings(){
+ return `<section>
+  <p class="eyebrow">AXIOM</p><h1>Settings</h1>
+  <div class="card settings">
+   <b>Data</b>
+   <button data-export>Export Study Data</button>
+   <button data-import>Import Study Data</button>
+   <input id="import-file" type="file" accept=".json,application/json" class="hidden">
+  </div>
+  <div class="card settings">
+   <b>About Axiom</b>
+   <span class="muted">Axiom is a local-first personal study platform. Your study data stays in this browser unless you export it.</span>
+  </div>
+  <div class="notice">Tip: export a JSON backup regularly if your study data is important.</div>
+ </section>`;
+}
+
+function bind(){
+ document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+ document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{
+   if(confirm("Delete this material?")){
+    data.materials=data.materials.filter(m=>m.id!==b.dataset.delete);
+    save();render();
+   }
+ });
+ const subject=document.getElementById("subject");
+ if(subject){
+   populateTopics();
+   subject.onchange=()=>{
+     document.getElementById("new-subject-wrap").classList.toggle("hidden",subject.value!=="new");
+     if(subject.value!=="new")populateTopics();
+     else document.getElementById("topic").innerHTML='<option value="new">＋ New Topic</option>';
+   };
+ }
+ const topic=document.getElementById("topic");
+ if(topic)topic.onchange=()=>document.getElementById("new-topic-wrap").classList.toggle("hidden",topic.value!=="new");
+ const form=document.getElementById("add-form");
+ if(form)form.onsubmit=saveMaterial;
+ const reveal=document.querySelector("[data-reveal]");
+ if(reveal)reveal.onclick=()=>{answerShown=true;render()};
+ document.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>rate(b.dataset.rate));
+ const ex=document.querySelector("[data-export]");
+ if(ex)ex.onclick=exportData;
+ const im=document.querySelector("[data-import]");
+ if(im)im.onclick=()=>document.getElementById("import-file").click();
+ const file=document.getElementById("import-file");
+ if(file)file.onchange=importData;
+}
+
+function saveMaterial(e){
+ e.preventDefault();
+ let subjectId=document.getElementById("subject").value;
+ if(subjectId==="new"){
+   const name=document.getElementById("new-subject").value.trim();
+   if(!name)return alert("Enter a subject name.");
+   const found=data.subjects.find(s=>s.name.toLowerCase()===name.toLowerCase());
+   subjectId=found?found.id:uid();
+   if(!found)data.subjects.push({id:subjectId,name});
+ }
+ let topicId=document.getElementById("topic").value;
+ if(topicId==="new"){
+   const name=document.getElementById("new-topic").value.trim();
+   if(!name)return alert("Enter a topic name.");
+   const found=data.topics.find(t=>t.subjectId===subjectId&&t.name.toLowerCase()===name.toLowerCase());
+   topicId=found?found.id:uid();
+   if(!found)data.topics.push({id:topicId,subjectId,name});
+ }
+ const m={
+   id:uid(),type:document.getElementById("type").value,
+   subjectId,topicId,
+   difficulty:Number(document.getElementById("difficulty").value),
+   tags:document.getElementById("tags").value.split(",").map(x=>x.trim()).filter(Boolean),
+   front:document.getElementById("front").value.trim(),
+   back:document.getElementById("back").value.trim(),
+   explanation:document.getElementById("explanation").value.trim(),
+   createdAt:new Date().toISOString(),lastStudied:null,nextReview:null,
+   correct:0,incorrect:0,timesStudied:0,mastery:0,streak:0
+ };
+ data.materials.push(m);save();
+ alert("Saved to Axiom.");
+ go("home");
+}
+
+function rate(kind){
+ const m=data.materials.find(x=>x.id===studyId);
+ if(!m)return;
+ m.timesStudied=(m.timesStudied||0)+1;
+ if(kind==="again"||kind==="hard")m.incorrect=(m.incorrect||0)+1;
+ else m.correct=(m.correct||0)+1;
+ const attempts=(m.correct||0)+(m.incorrect||0);
+ m.mastery=Math.max(0,Math.min(100,Math.round((m.correct||0)/attempts*100)));
+ if(kind==="easy"||kind==="good")m.streak=(m.streak||0)+1;else m.streak=0;
+ const days={again:0,hard:1,good:3,easy:7}[kind];
+ m.lastStudied=new Date().toISOString();
+ m.nextReview=new Date(Date.now()+days*86400000).toISOString();
+ data.sessions.push({id:uid(),materialId:m.id,date:m.lastStudied,rating:kind});
+ save();
+ const next=dueList().find(x=>x.id!==m.id);
+ studyId=next?next.id:null;
+ answerShown=false;render();
+}
+
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download="axiom-backup-"+new Date().toISOString().slice(0,10)+".json";
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+
+function importData(e){
+ const file=e.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const incoming=JSON.parse(reader.result);
+   if(!incoming.subjects||!incoming.topics||!incoming.materials)throw new Error();
+   data=incoming;save();alert("Import complete.");render();
+  }catch(err){alert("That file is not a valid Axiom backup.");}
+ };
+ reader.readAsText(file);
+}
+
+render();
+</script>
+</body>
+</html>
