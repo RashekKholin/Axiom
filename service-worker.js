@@ -1,4 +1,4 @@
-const CACHE_NAME = "axiom-v2";
+const CACHE_NAME = "axiom-v3";
 
 const FILES_TO_CACHE = [
     "./",
