@@ -342,9 +342,16 @@
 
 <script>
     if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker.register("./service-worker.js");
-        });
+        navigator.serviceWorker.register("./service-worker.js")
+            .then(function () {
+                console.log("Axiom service worker registered.");
+            })
+            .catch(function (error) {
+                console.error(
+                    "Axiom service worker failed:",
+                    error
+                );
+            });
     }
 </script>
 
